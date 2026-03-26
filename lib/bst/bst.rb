@@ -33,28 +33,41 @@ module BST
     end
 
     def include?(value)
+      return false if empty?
+
+      root.bfs { |node| return true if node.value == value }
+      false
     end
 
     def delete(value)
     end
 
     def level_order
+      return nil if empty?
+
       root.bfs.to_a.map { |node| node.value }
     end
 
     def inorder
+      return nil if empty?
+
       root.dfs(order: :inorder).to_a.map { |node, _level| node.value }
     end
 
     def preorder
+      return nil if empty?
+
       root.dfs(order: :preorder).to_a.map { |node, _level| node.value }
     end
 
     def postorder
+      return nil if empty?
+
       root.dfs(order: :postorder).to_a.map { |node, _level| node.value }
     end
 
     def height(value: nil)
+      return nil if empty?
       return nil if value.nil?
 
       cur_node = nil
@@ -67,6 +80,7 @@ module BST
     end
 
     def depth(value: nil)
+      return nil if empty?
       return nil if value.nil?
 
       depth = nil

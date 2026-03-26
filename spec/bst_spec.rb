@@ -2,7 +2,7 @@ require_relative '../lib/bst'
 
 describe BST::BST do
   subject(:bst) { BST::BST.new }
-  describe '#to_a' do
+  describe 'build and traverse tree' do
     unloaders = {
       inorder: ->(obj) { obj.inorder },
       preorder: ->(obj) { obj.preorder },
@@ -143,6 +143,75 @@ describe BST::BST do
           expect(result).to eql(arr_levelorder) if name == :levelorder
         end
       end
+    end
+  end
+  describe '#height' do
+    it 'empty tree returns nil' do
+      expect(bst.height(value: 0)).to be_nil
+    end
+    it 'single node, value not found' do
+      bst.insert(value: 1)
+      expect(bst.height(value: 0)).to be_nil
+    end
+    it 'single node, height = 0' do
+      bst.insert(value: 0)
+      expect(bst.height(value: 0)).to eql(0)
+    end
+    it 'first level, root = 1, leaves = 0' do
+      bst.build_tree(arr: [10, 5, 15])
+      expect(bst.height(value: 0)).to be_nil
+      expect(bst.height(value: 10)).to eql(1)
+      expect(bst.height(value: 5)).to eql(0)
+      expect(bst.height(value: 15)).to eql(0)
+    end
+    it 'root height = 3, leaf = 0' do
+      bst.build_tree(arr: [10, 5, 15, 12, 14])
+      expect(bst.height(value: 0)).to be_nil
+      expect(bst.height(value: 10)).to eql(3)
+      expect(bst.height(value: 14)).to eql(0)
+    end
+  end
+  describe '#depth' do
+    it 'empty tree returns nil' do
+      expect(bst.depth(value: 0)).to be_nil
+    end
+    it 'single node, value not found' do
+      bst.insert(value: 1)
+      expect(bst.depth(value: 0)).to be_nil
+    end
+    it 'single node, height = 0' do
+      bst.insert(value: 0)
+      expect(bst.depth(value: 0)).to eql(0)
+    end
+    it 'first level, root = 0, leaves = 1' do
+      bst.build_tree(arr: [10, 5, 15])
+      expect(bst.depth(value: 0)).to be_nil
+      expect(bst.depth(value: 10)).to eql(0)
+      expect(bst.depth(value: 5)).to eql(1)
+      expect(bst.depth(value: 15)).to eql(1)
+    end
+    it 'root depth = 0, leaf = 3' do
+      bst.build_tree(arr: [10, 5, 15, 12, 14])
+      expect(bst.depth(value: 0)).to be_nil
+      expect(bst.depth(value: 10)).to eql(0)
+      expect(bst.depth(value: 14)).to eql(3)
+    end
+  end
+  describe '#include?' do
+    it 'return false on empty tree' do
+      expect(bst.include?(0)).to eql(false)
+    end
+    it 'return true when value is in tree' do
+      bst.build_tree(arr: [10, 5, 15, 12, 14])
+      expect(bst.include?(10)).to eql(true)
+      expect(bst.include?(5)).to eql(true)
+      expect(bst.include?(15)).to eql(true)
+      expect(bst.include?(12)).to eql(true)
+      expect(bst.include?(14)).to eql(true)
+    end
+    it 'return false when value is not in tree' do
+      bst.build_tree(arr: [10, 5, 15, 12, 14])
+      expect(bst.include?(9)).to eql(false)
     end
   end
 end

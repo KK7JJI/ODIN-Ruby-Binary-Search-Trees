@@ -31,8 +31,13 @@ bst = BST::BST.new
 arr = Array.new(20) { rand(100) }
 puts arr.inspect
 bst.build_tree(arr: arr)
+bst.insert(value: 50)
+
 bst.pretty_print
 puts bst.inorder.inspect
 puts bst.postorder.inspect
 puts bst.preorder.inspect
 puts bst.level_order.inspect
+
+puts bst.include?(50)
+puts bst.include?(101)
