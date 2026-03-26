@@ -3,6 +3,12 @@ require_relative '../lib/bst'
 describe BST::BST do
   subject(:bst) { BST::BST.new }
   describe 'build and traverse tree' do
+    it '#build_tree returns root node' do
+      expect(bst.build_tree(arr: [0]).value).to eql(bst.preorder[0])
+    end
+    it '#build_tree returns root node' do
+      expect(bst.build_tree(arr: [15, 5, 10]).value).to eql(bst.preorder[0])
+    end
     unloaders = {
       inorder: ->(obj) { obj.inorder },
       preorder: ->(obj) { obj.preorder },
