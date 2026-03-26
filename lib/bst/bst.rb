@@ -19,13 +19,6 @@ module BST
       self.root = Node.new(value: value) if root.nil?
     end
 
-    def to_a(order: :inorder)
-      return preorder.to_a if order == :preorder
-      return postorder.to_a if order == :postorder
-
-      inorder.to_a
-    end
-
     def pretty_print
       puts "\n********* BST **********"
       arr = []
@@ -46,24 +39,41 @@ module BST
     end
 
     def level_order
+      root.bfs.to_a.map { |node| node.value }
     end
 
-    def inorder(&block)
-      root.traverse(order: :inorder, &block)
+    def inorder
+      root.dfs(order: :inorder).to_a.map { |node, _level| node.value }
     end
 
-    def preorder(&block)
-      root.traverse(order: :preorder, &block)
+    def preorder
+      root.dfs(order: :preorder).to_a.map { |node, _level| node.value }
     end
 
-    def postorder(&block)
-      root.traverse(order: :postorder, &block)
+    def postorder
+      root.dfs(order: :postorder).to_a.map { |node, _level| node.value }
     end
 
-    def height
+    def height(value: nil)
+      return nil if value.nil?
+
+      cur_node = nil
+      root.dfs { |node| cur_node = node if node.value == value }
+      return nil if cur_node.nil?
+
+      height = 0
+      cur_node.dfs.to_a.map { |_node, level| height = level if level > height }
+      height
     end
 
-    def depth
+    def depth(value: nil)
+      return nil if value.nil?
+
+      depth = nil
+      root.dfs { |node, level| depth = level if node.value == value }
+      return nil if depth.nil?
+
+      depth
     end
 
     def balanced?
@@ -85,14 +95,15 @@ module BST
     def insert_node(node: nil, value: nil)
       return Node.new(value: value) if node.nil?
 
-      if value <= node.value
+      if value < node.value
         result = insert_node(node: node.lc, value: value)
         node.lc = result if result
-      else
+      elsif value > node.value
         result = insert_node(node: node.rc, value: value)
         node.rc = result if result
       end
 
+      # duplicate values are not permitted in this BST.
       nil
     end
 
@@ -108,7 +119,7 @@ module BST
 
   # binary search tree node
   class Node
-    attr_accessor :value, :lc, :rc
+    attr_accessor :value, :lc, :rc, :queue
 
     def initialize(value: nil, lc: nil, rc: nil)
       @value = value
@@ -116,14 +127,57 @@ module BST
       @rc = rc
     end
 
-    def traverse(order: nil, &block)
-      return enum_for(:traverse, order: order) unless block
+    def bfs(&block)
+      return enum_for(:bfs) unless block
 
-      yield value if order == :preorder
-      lc&.traverse(order: order, &block)
-      yield value if order == :inorder
-      rc&.traverse(order: order, &block)
-      yield value if order == :postorder
+      queue = Queue.new
+
+      queue.enqueue(self)
+      until queue.empty?
+        node = queue.dequeue
+        queue.enqueue(node.lc) unless node.lc.nil?
+        queue.enqueue(node.rc) unless node.rc.nil?
+        yield(node)
+      end
+    end
+
+    def dfs(order: :inorder, level: nil, &block)
+      return enum_for(:dfs, order: order, level: level) unless block
+
+      level += 1 unless level.nil?
+      level = 0 if level.nil?
+
+      yield(self, level) if order == :preorder
+      lc&.dfs(order: order, level: level, &block)
+      yield(self, level) if order == :inorder
+      rc&.dfs(order: order, level: level, &block)
+      yield(self, level) if order == :postorder
+    end
+  end
+
+  # queue for use in bfs traversal
+  class Queue
+    attr_accessor :length, :contents
+
+    def initialize
+      @contents = []
+      @length = 0
+    end
+
+    def enqueue(value)
+      contents.push(value)
+      self.length += 1
+    end
+
+    def dequeue
+      return nil if empty?
+
+      self.length -= 1
+      contents.shift
+    end
+
+    def empty?
+      contents.empty?
     end
   end
 end
