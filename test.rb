@@ -14,7 +14,7 @@ puts ''
 bst = BST::BST.new
 bst.build_tree(arr: [10, 5, 15, 14, 20, 17, 22, 7, 0, 1])
 
-bst.pp
+bst.pretty_print
 
 puts bst.height(value: 10)
 puts bst.height(value: 15)
@@ -35,7 +35,7 @@ puts arr.inspect
 bst.build_tree(arr: arr)
 bst.insert(value: 50)
 
-bst.pp
+bst.pretty_print
 puts bst.inorder.inspect
 puts bst.postorder.inspect
 puts bst.preorder.inspect
@@ -47,6 +47,6 @@ puts bst.include?(101)
 puts ''
 bst = BST::BST.new
 bst.build_tree(arr: [10, 5, 15, 7, 6, 8, 12, 18])
-bst.pp
+bst.pretty_print
 puts ''
 puts bst.inorder.inspect

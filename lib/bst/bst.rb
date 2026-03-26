@@ -21,7 +21,7 @@ module BST
       self.root = Node.new(value: value) if root.nil?
     end
 
-    def pp
+    def pretty_print
       root.pp
     end
 
@@ -32,13 +32,24 @@ module BST
       false
     end
 
-    def delete(value)
+    def find(value: nil)
+      return nil if empty?
+
+      root.bfs { |node| return node if node.value == value }
+      nil
+    end
+
+    def delete(value: nil)
+      return nil if empty?
+      return nil if value.nil?
+
+      delete_node(find(value: value))
     end
 
     def level_order
       return nil if empty?
 
-      root.bfs.to_a.map { |node| node.value }
+      root.bfs.to_a.map(&:value)
     end
 
     def inorder
@@ -63,24 +74,20 @@ module BST
       return nil if empty?
       return nil if value.nil?
 
-      cur_node = nil
-      root.dfs { |node| cur_node = node if node.value == value }
-      return nil if cur_node.nil?
+      node = find(value: value)
+      return nil if node.nil?
 
-      height = 0
-      cur_node.dfs.to_a.map { |_node, level| height = level if level > height }
-      height
+      node.node_height
     end
 
     def depth(value: nil)
       return nil if empty?
       return nil if value.nil?
 
-      depth = nil # remains nil if value not found.
-      root.dfs { |node, level| depth = level if node.value == value }
-      return nil if depth.nil?
+      node = find(value: value)
+      return nil if node.nil?
 
-      depth
+      node.node_depth(ref_node: root)
     end
 
     def balanced?

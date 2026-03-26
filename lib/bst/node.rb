@@ -10,6 +10,25 @@ class Node
     @rc = rc
   end
 
+  def leaf?
+    return false if lc
+    return false if rc
+
+    true
+  end
+
+  def node_height
+    height = 0
+    dfs.to_a.map { |_node, level| height = level if level > height }
+    height
+  end
+
+  def node_depth(ref_node: nil)
+    depth = nil # remains nil if value not found.
+    ref_node.dfs { |node, level| return level if node == self }
+    depth
+  end
+
   def bfs(&block)
     return enum_for(:bfs) unless block
 
@@ -24,6 +43,34 @@ class Node
     end
 
     self
+  end
+
+  def delete_node
+    if promote_left?
+      value = lc.value
+      lc = nil if lc.leaf?
+      delete_node(lc) if lc
+    end
+
+    return unless promote_right?
+
+    value = rc.value
+    rc = nil if rc.leaf?
+    delete_node(rc) if rc
+  end
+
+  def promote_right?
+    return false if rc.nil?
+    return false if promote_left?
+
+    true
+  end
+
+  def promote_left?
+    return false if lc.nil?
+    return false if node_height(lc) < node_height(rc)
+
+    true
   end
 
   def dfs(order: :inorder, level: nil, &block)
