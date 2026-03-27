@@ -294,4 +294,45 @@ describe BST::BST do
       end
     end
   end
+
+  describe '#balance? and #rebalance' do
+    it 'balance? returns true on empty tree' do
+      expect(bst).to be_balanced
+    end
+    it 'rebalance returns nil on empty tree' do
+      expect(bst.rebalance).to be_nil
+    end
+    it 'a one node tree is balanced.' do
+      bst.build_tree(arr: [0])
+      expect(bst).to be_balanced
+    end
+    it 'rebalancing a one node tree returns nil.' do
+      bst.build_tree(arr: [0])
+      expect(bst.rebalance).to be_nil
+    end
+    it 'rebalance - degenerate (right) 3 node tree' do
+      bst.build_tree(arr: [0, 5, 10])
+      expect(bst).not_to be_balanced
+      bst.rebalance
+      expect(bst).to be_balanced
+    end
+    it 'rebalance - degenerate (left) 3 node tree' do
+      bst.build_tree(arr: [10, 5, 0])
+      expect(bst).not_to be_balanced
+      bst.rebalance
+      expect(bst).to be_balanced
+    end
+    it 'rebalance - degenerate (right) 20 node tree' do
+      bst.build_tree(arr: Array.new(20) { rand(100) }.sort)
+      expect(bst).not_to be_balanced
+      bst.rebalance
+      expect(bst).to be_balanced
+    end
+    it 'rebalance - degenerate (left) 20 node tree' do
+      bst.build_tree(arr: Array.new(20) { rand(100) }.sort.reverse)
+      expect(bst).not_to be_balanced
+      bst.rebalance
+      expect(bst).to be_balanced
+    end
+  end
 end

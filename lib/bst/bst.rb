@@ -145,8 +145,8 @@ module BST
       return true if root.leaf?
 
       root.bfs do |node|
-        lhs = node.lc.nil? ? 0 : node.lc.node_height
-        rhs = node.rc.nil? ? 0 : node.rc.node_height || 0
+        lhs = node.lc.nil? ? -1 : node.lc.node_height
+        rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
         return false unless (lhs - rhs).abs <= 1
       end
 
@@ -154,6 +154,8 @@ module BST
     end
 
     def rebalance
+      return nil if empty?
+
       root.dfs(order: :preorder) do |node|
         lhs = node.lc.nil? ? -1 : node.lc.node_height
         rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
@@ -172,6 +174,8 @@ module BST
           node.rotate_right
         end
       end
+
+      nil
     end
 
     def empty?
