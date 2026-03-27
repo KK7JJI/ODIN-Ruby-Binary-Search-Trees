@@ -138,7 +138,7 @@ class Node
 
   def ch_prefix(category, prefix, lch, rch)
     msg = {
-      left: ->(prefix) { "#{prefix}#{lch}    " },
+      left: ->(prefix) { "#{prefix}#{lch}   " },
       right: ->(prefix) { "#{prefix}#{rch}   " }
     }
     msg[category].call(prefix)
