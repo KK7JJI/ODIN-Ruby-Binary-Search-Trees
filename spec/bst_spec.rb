@@ -220,4 +220,78 @@ describe BST::BST do
       expect(bst.include?(9)).to eql(false)
     end
   end
+
+  describe '#delete' do
+    it 'returns nil against an empty tree.' do
+      expect(bst.delete(value: 0)).to be_nil
+    end
+    it 'returns nil when value is not found in tree.' do
+      bst.insert(value: 0)
+      expect(bst.delete(value: 1)).to be_nil
+      expect(bst.inorder.to_a).to eql([0])
+    end
+    it 'deletes root node when it is the only node present' do
+      bst.insert(value: 0)
+      expect(bst.delete(value: 0)).to be_nil
+      expect(bst.inorder.to_a).to eql([])
+      expect(bst).to be_empty
+    end
+    it 'deletes root node, left node is promoted' do
+      bst.insert(value: 10)
+      bst.insert(value: 5)
+      expect(bst.inorder.to_a).to eql([5, 10])
+      bst.delete(value: 10)
+      expect(bst.inorder.to_a).to eql([5])
+    end
+    it 'deletes root node, right node is promoted' do
+      bst.insert(value: 10)
+      bst.insert(value: 15)
+      expect(bst.inorder.to_a).to eql([10, 15])
+      bst.delete(value: 10)
+      expect(bst.inorder.to_a).to eql([15])
+    end
+    it 'deletes level 1 leaves' do
+      bst.build_tree(arr: [10, 5, 15])
+      bst.delete(value: 5)
+      expect(bst.inorder.to_a).to eql([10, 15])
+      bst.delete(value: 15)
+      expect(bst.inorder.to_a).to eql([10])
+    end
+    it 'deletes level 2 leaves' do
+      bst.build_tree(arr: [20, 10, 5, 15, 30, 25, 35])
+      bst.delete(value: 35)
+      expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 25, 30])
+      bst.delete(value: 25)
+      expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 30])
+      bst.delete(value: 5)
+      expect(bst.inorder.to_a).to eql([10, 15, 20, 30])
+      bst.delete(value: 15)
+      expect(bst.inorder.to_a).to eql([10, 20, 30])
+    end
+    it 'deletes level 1 nodes preserving leaves' do
+      bst.build_tree(arr: [20, 10, 15, 30, 25])
+      bst.delete(value: 10)
+      expect(bst.inorder.to_a).to eql([15, 20, 25, 30])
+      bst.delete(value: 30)
+      expect(bst.inorder.to_a).to eql([15, 20, 25])
+    end
+    it 'delete all nodes sequentially' do
+      arr = Array.new(25) { rand(100) }
+      bst.build_tree(arr: arr)
+      arr1 = arr.dup
+
+      arr.shuffle.each do |i|
+        bst.delete(value: i)
+        arr1.delete(i)
+
+        arr1.each do |j|
+          expect(bst.include?(j)).to eql(true)
+        end
+
+        bst.inorder.to_a.each do |j|
+          expect(arr1.include?(j)).to eql(true)
+        end
+      end
+    end
+  end
 end

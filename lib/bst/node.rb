@@ -37,19 +37,24 @@ class Node
 
     if promote_left?
       self.value = lc.value
-      self.lc = lc.lc
-      self.rc = lc.rc
+      left = lc.lc
+      right = lc.rc
+      self.lc = left
+      self.rc = right
       root.insert_node(node: save_node.rc) unless save_node.rc.nil?
     elsif promote_right?
       self.value = rc.value
-      self.lc = rc.lc
-      self.rc = rc.rc
+      left = rc.lc
+      right = rc.rc
+      self.lc = left
+      self.rc = right
       root.insert_node(node: save_node.lc) unless save_node.lc.nil?
     end
   end
 
   def promote_left?
     return false if lc.nil?
+    return true if rc.nil?
     return true if lc.node_height > rc.node_height
 
     false

@@ -42,17 +42,6 @@ module BST
       nil
     end
 
-    def find_parent(value: nil)
-      return nil if empty?
-
-      root.bfs do |node|
-        return node if !node.lc.nil? && node.lc.value == value
-        return node if !node.rc.nil? && node.rc.value == value
-      end
-
-      nil
-    end
-
     def delete(value: nil)
       return nil if empty?
       return nil if value.nil?
@@ -60,7 +49,11 @@ module BST
       node = nil
 
       # delete root node
-      root.node_delete(root: root) if value == root.value
+      if value == root.value
+        self.root = nil if root.leaf?
+        root.node_delete(root: root) unless empty?
+        return nil
+      end
 
       # find parent of node to be deleted
       parent = find_parent(value: value)
@@ -71,11 +64,15 @@ module BST
       return nil if node.nil?
 
       # delete body nodes
-      node.node_delete(root: root) unless node.leaf?
+      return node.node_delete(root: root) unless node.leaf?
 
       # delete leaves
-      parent.lc = nil if node.leaf? && node == parent.lc
-      parent.rc = nil if node.leaf? && node == parent.rc
+      return parent.lc = nil if node.leaf? && node == parent.lc
+      return parent.rc = nil if node.leaf? && node == parent.rc
+
+      return nil if node.nil?
+
+      value
     end
 
     def level_order
@@ -138,19 +135,15 @@ module BST
 
     attr_accessor :root
 
-    # def insert_node(node: nil, value: nil)
-    #   return Node.new(value: value) if node.nil?
+    def find_parent(value: nil)
+      return nil if empty?
 
-    #   if value < node.value
-    #     result = insert_node(node: node.lc, value: value)
-    #     node.lc = result if result
-    #   elsif value > node.value
-    #     result = insert_node(node: node.rc, value: value)
-    #     node.rc = result if result
-    #   end
+      root.bfs do |node|
+        return node if !node.lc.nil? && node.lc.value == value
+        return node if !node.rc.nil? && node.rc.value == value
+      end
 
-    #   # duplicate values are not permitted in this BST.
-    #   nil
-    # end
+      nil
+    end
   end
 end

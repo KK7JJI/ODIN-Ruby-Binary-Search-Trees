@@ -4,6 +4,16 @@ require_relative 'lib/bst/bst'
 
 bst = BST::BST.new
 
+arr = [41, 22, 2, 77, 32]
+bst.build_tree(arr: arr)
+bst.delete(value: 41)
+puts ''
+bst.pretty_print
+bst.delete(value: 32)
+puts ''
+bst.pretty_print
+return
+
 bst.build_tree(arr: [10, 5, 15])
 # puts bst.to_a
 puts bst.inorder
@@ -75,3 +85,29 @@ bst.pretty_print
 puts ''
 puts bst.inorder.inspect
 puts ''
+
+puts ''
+bst = BST::BST.new
+bst.build_tree(arr: [10, 15])
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
+bst.delete(value: 10)
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
+
+bst = BST::BST.new
+bst.build_tree(arr: [15, 11, 98, 5, 4])
+puts ''
+puts bst.inorder.to_a.inspect
+puts ''
+bst.pretty_print
+puts ''
+bst.delete(value: 15)
+puts ''
+puts bst.inorder.to_a.inspect
+bst.pretty_print
+puts bst.include?(value: 98)
