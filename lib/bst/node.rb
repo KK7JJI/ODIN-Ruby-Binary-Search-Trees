@@ -32,24 +32,22 @@ class Node
     nil
   end
 
-  def node_delete(root: nil)
+  def node_delete
     save_node = Node.new(value: value, lc: lc, rc: rc)
-
+    # leaf cases are handled elsewhere.
     if promote_left?
-      self.value = lc.value
-      left = lc.lc
-      right = lc.rc
-      self.lc = left
-      self.rc = right
-      root.insert_node(node: save_node.rc) unless save_node.rc.nil?
+      copy_node(source: lc)
+      insert_node(node: save_node.rc) unless save_node.rc.nil?
     elsif promote_right?
-      self.value = rc.value
-      left = rc.lc
-      right = rc.rc
-      self.lc = left
-      self.rc = right
-      root.insert_node(node: save_node.lc) unless save_node.lc.nil?
+      copy_node(source: rc)
+      insert_node(node: save_node.lc) unless save_node.lc.nil?
     end
+  end
+
+  def copy_node(source: nil)
+    self.value = source.value
+    self.rc = source.rc
+    self.lc = source.lc
   end
 
   def promote_left?
@@ -66,6 +64,10 @@ class Node
     return true if rc.node_height >= lc.node_height
 
     false
+  end
+
+  def rotate_right
+    temp = Node.new(value: value, rc: rc, lc: lc)
   end
 
   def node_height

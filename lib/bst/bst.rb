@@ -22,6 +22,10 @@ module BST
       self.root = new_node if root.nil?
     end
 
+    def clear
+      self.root = nil
+    end
+
     def pretty_print
       return nil if empty?
 
@@ -51,7 +55,7 @@ module BST
       # delete root node
       if value == root.value
         self.root = nil if root.leaf?
-        root.node_delete(root: root) unless empty?
+        root.node_delete unless empty?
         return nil
       end
 
@@ -64,7 +68,7 @@ module BST
       return nil if node.nil?
 
       # delete body nodes
-      return node.node_delete(root: root) unless node.leaf?
+      return node.node_delete unless node.leaf?
 
       # delete leaves
       return parent.lc = nil if node.leaf? && node == parent.lc
@@ -120,6 +124,16 @@ module BST
     end
 
     def balanced?
+      return true if empty?
+      return true if root.leaf?
+
+      root.bfs do |node|
+        lhs = node.lc.nil? ? 0 : node.lc.node_height
+        rhs = node.rc.nil? ? 0 : node.rc.node_height || 0
+        return false unless (lhs - rhs).abs <= 1
+      end
+
+      true
     end
 
     def rebalance

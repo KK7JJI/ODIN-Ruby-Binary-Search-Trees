@@ -275,8 +275,8 @@ describe BST::BST do
       bst.delete(value: 30)
       expect(bst.inorder.to_a).to eql([15, 20, 25])
     end
-    it 'delete all nodes sequentially' do
-      arr = Array.new(25) { rand(100) }
+    it 'delete all nodes randomly' do
+      arr = Array.new(50) { rand(100) }
       bst.build_tree(arr: arr)
       arr1 = arr.dup
 
