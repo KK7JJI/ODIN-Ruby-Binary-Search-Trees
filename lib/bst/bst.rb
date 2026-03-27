@@ -17,11 +17,14 @@ module BST
     end
 
     def insert(value: nil)
-      insert_node(node: root, value: value) unless root.nil?
-      self.root = Node.new(value: value) if root.nil?
+      new_node = Node.new(value: value)
+      root&.insert_node(node: new_node)
+      self.root = new_node if root.nil?
     end
 
     def pretty_print
+      return nil if empty?
+
       root.pp
     end
 
@@ -39,11 +42,40 @@ module BST
       nil
     end
 
+    def find_parent(value: nil)
+      return nil if empty?
+
+      root.bfs do |node|
+        return node if !node.lc.nil? && node.lc.value == value
+        return node if !node.rc.nil? && node.rc.value == value
+      end
+
+      nil
+    end
+
     def delete(value: nil)
       return nil if empty?
       return nil if value.nil?
 
-      delete_node(find(value: value))
+      node = nil
+
+      # delete root node
+      root.node_delete(root: root) if value == root.value
+
+      # find parent of node to be deleted
+      parent = find_parent(value: value)
+      return nil if parent.nil?
+
+      node = parent.lc if !parent.lc.nil? && value == parent.lc.value
+      node = parent.rc if !parent.rc.nil? && value == parent.rc.value
+      return nil if node.nil?
+
+      # delete body nodes
+      node.node_delete(root: root) unless node.leaf?
+
+      # delete leaves
+      parent.lc = nil if node.leaf? && node == parent.lc
+      parent.rc = nil if node.leaf? && node == parent.rc
     end
 
     def level_order
@@ -106,19 +138,19 @@ module BST
 
     attr_accessor :root
 
-    def insert_node(node: nil, value: nil)
-      return Node.new(value: value) if node.nil?
+    # def insert_node(node: nil, value: nil)
+    #   return Node.new(value: value) if node.nil?
 
-      if value < node.value
-        result = insert_node(node: node.lc, value: value)
-        node.lc = result if result
-      elsif value > node.value
-        result = insert_node(node: node.rc, value: value)
-        node.rc = result if result
-      end
+    #   if value < node.value
+    #     result = insert_node(node: node.lc, value: value)
+    #     node.lc = result if result
+    #   elsif value > node.value
+    #     result = insert_node(node: node.rc, value: value)
+    #     node.rc = result if result
+    #   end
 
-      # duplicate values are not permitted in this BST.
-      nil
-    end
+    #   # duplicate values are not permitted in this BST.
+    #   nil
+    # end
   end
 end

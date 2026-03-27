@@ -17,6 +17,52 @@ class Node
     true
   end
 
+  def insert_node(node: nil)
+    # return Node.new(value: set_value)
+
+    if node.value < value
+      lc&.insert_node(node: node)
+      self.lc = node if lc.nil?
+    elsif node.value > value
+      rc&.insert_node(node: node)
+      self.rc = node if rc.nil?
+    end
+
+    # duplicate values are not permitted in this BST.
+    nil
+  end
+
+  def node_delete(root: nil)
+    save_node = Node.new(value: value, lc: lc, rc: rc)
+
+    if promote_left?
+      self.value = lc.value
+      self.lc = lc.lc
+      self.rc = lc.rc
+      root.insert_node(node: save_node.rc) unless save_node.rc.nil?
+    elsif promote_right?
+      self.value = rc.value
+      self.lc = rc.lc
+      self.rc = rc.rc
+      root.insert_node(node: save_node.lc) unless save_node.lc.nil?
+    end
+  end
+
+  def promote_left?
+    return false if lc.nil?
+    return true if lc.node_height > rc.node_height
+
+    false
+  end
+
+  def promote_right?
+    return false if rc.nil?
+    return true if lc.nil?
+    return true if rc.node_height >= lc.node_height
+
+    false
+  end
+
   def node_height
     height = 0
     dfs.to_a.map { |_node, level| height = level if level > height }
@@ -43,34 +89,6 @@ class Node
     end
 
     self
-  end
-
-  def delete_node
-    if promote_left?
-      value = lc.value
-      lc = nil if lc.leaf?
-      delete_node(lc) if lc
-    end
-
-    return unless promote_right?
-
-    value = rc.value
-    rc = nil if rc.leaf?
-    delete_node(rc) if rc
-  end
-
-  def promote_right?
-    return false if rc.nil?
-    return false if promote_left?
-
-    true
-  end
-
-  def promote_left?
-    return false if lc.nil?
-    return false if node_height(lc) < node_height(rc)
-
-    true
   end
 
   def dfs(order: :inorder, level: nil, &block)

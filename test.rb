@@ -50,3 +50,28 @@ bst.build_tree(arr: [10, 5, 15, 7, 6, 8, 12, 18])
 bst.pretty_print
 puts ''
 puts bst.inorder.inspect
+puts ''
+
+bst.delete(value: 8)
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
+
+bst.delete(value: 15)
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
+
+bst.delete(value: 5)
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
+
+bst.delete(value: 10)
+bst.pretty_print
+puts ''
+puts bst.inorder.inspect
+puts ''
