@@ -46,37 +46,54 @@ module BST
       nil
     end
 
+    def delete_root_node
+      return self.root = nil if root.leaf?
+
+      if root.child_count == 2
+        root.rc.insert_node(node: root.lc)
+        root.lc = nil
+      end
+
+      return self.root = root.lc if root.rc.nil?
+
+      self.root = root.rc if root.lc.nil?
+
+      nil
+    end
+
     def delete(value: nil)
       return nil if empty?
       return nil if value.nil?
 
-      node = nil
+      parent = find_parent(value: value)
+      node = find(value: value) if parent.nil?
+      return nil if node.nil? && parent.nil?
+      return delete_root_node if parent.nil?
 
-      # delete root node
-      if value == root.value
-        self.root = nil if root.leaf?
-        root.node_delete unless empty?
+      del_node = parent.lc if parent.rc.nil?
+      del_node = parent.rc if parent.lc.nil?
+      del_node ||= parent.lc.value == value ? parent.lc : parent.rc
+
+      if del_node.leaf?
+        parent.lc = nil if parent.lc == del_node
+        parent.rc = nil if parent.rc == del_node
         return nil
       end
 
-      # find parent of node to be deleted
-      parent = find_parent(value: value)
-      return nil if parent.nil?
+      if del_node.child_count == 2
+        del_node.rc.insert_node(node: del_node.lc)
+        del_node.lc = nil
+      end
 
-      node = parent.lc if !parent.lc.nil? && value == parent.lc.value
-      node = parent.rc if !parent.rc.nil? && value == parent.rc.value
-      return nil if node.nil?
+      if parent.lc == del_node
+        parent.lc = del_node.lc if del_node.rc.nil?
+        parent.lc = del_node.rc if del_node.lc.nil?
+      else
+        parent.rc = del_node.lc if del_node.rc.nil?
+        parent.rc = del_node.rc if del_node.lc.nil?
+      end
 
-      # delete body nodes
-      return node.node_delete unless node.leaf?
-
-      # delete leaves
-      return parent.lc = nil if node.leaf? && node == parent.lc
-      return parent.rc = nil if node.leaf? && node == parent.rc
-
-      return nil if node.nil?
-
-      value
+      nil
     end
 
     def level_order
@@ -137,6 +154,26 @@ module BST
     end
 
     def rebalance
+      root.dfs(order: :preorder) do |node|
+        lhs = node.lc.nil? ? 0 : node.lc.node_height
+        rhs = node.rc.nil? ? 0 : node.rc.node_height || 0
+
+        delta = rhs > lhs ? rhs - lhs : 0
+        rotate = delta.abs / 2
+
+        puts "node: #{node.value}, delta #{delta}: rh: #{rhs}, lh #{lhs}"
+        rotate.times do
+          node.rotate_left
+        end
+
+        delta = lhs > rhs ? lhs - rhs : 0
+        rotate = delta.abs / 2
+
+        puts "node: #{node.value}, delta #{delta}: rh: #{rhs}, lh #{lhs}"
+        rotate.times do
+          node.rotate_right
+        end
+      end
     end
 
     def empty?
