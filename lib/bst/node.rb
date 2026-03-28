@@ -1,32 +1,33 @@
 # frozen_string_literal: true
 
-# binary search tree node
+# binary search tree namespace
 module BST
+  # binary search tree node
   class Node
-    attr_accessor :value, :lc, :rc, :queue
+    attr_accessor :value, :lcld, :rcld, :queue
 
-    def initialize(value: nil, lc: nil, rc: nil)
+    def initialize(value: nil, lcld: nil, rcld: nil)
       @value = value
-      @lc = lc
-      @rc = rc
+      @lcld = lcld
+      @rcld = rcld
     end
 
     def leaf?
-      return false if lc
-      return false if rc
+      return false if lcld
+      return false if rcld
 
       true
     end
 
     def insert_node(node: nil)
       if node.value < value
-        result = lc&.insert_node(node: node)
-        result = 1 if lc.nil?
-        self.lc = node if lc.nil?
+        result = lcld&.insert_node(node: node)
+        result = 1 if lcld.nil?
+        self.lcld = node if lcld.nil?
       elsif node.value > value
-        result = rc&.insert_node(node: node)
-        result = 1 if rc.nil?
-        self.rc = node if rc.nil?
+        result = rcld&.insert_node(node: node)
+        result = 1 if rcld.nil?
+        self.rcld = node if rcld.nil?
       else
         result = 0
       end
@@ -35,48 +36,47 @@ module BST
 
     def child_count
       return 0 if leaf?
-      return 1 if lc.nil? || rc.nil?
+      return 1 if lcld.nil? || rcld.nil?
 
       2
     end
 
     def copy_node(source: nil)
       self.value = source.value
-      self.rc = source.rc
-      self.lc = source.lc
+      self.rcld = source.rcld
+      self.lcld = source.lcld
     end
 
     def promote_left?
-      return false if lc.nil?
-      return true if rc.nil?
-      return true if lc.node_height > rc.node_height
+      return false if lcld.nil?
+      return true if rcld.nil?
+      return true if lcld.node_height > rcld.node_height
 
       false
     end
 
     def promote_right?
-      return false if rc.nil?
-      return true if lc.nil?
-      return true if rc.node_height >= lc.node_height
+      return false if rcld.nil?
+      return true if lcld.nil?
+      return true if rcld.node_height >= lcld.node_height
 
       false
     end
 
     def rotate_right
-      return nil if lc.nil?
+      return nil if lcld.nil?
 
-      temp = Node.new(value: value, rc: rc, lc: nil)
-      copy_node(source: lc)
+      temp = Node.new(value: value, rcld: rcld, lcld: nil)
+      copy_node(source: lcld)
       insert_node(node: temp)
       nil
     end
 
     def rotate_left
-      return nil if rc.nil?
+      return nil if rcld.nil?
 
-      temp = Node.new(value: value, rc: nil, lc: lc)
-      copy_node(source: rc)
-      # rc = rc.nil? ? temp : rc.insert_node(node: temp)
+      temp = Node.new(value: value, rcld: nil, lcld: lcld)
+      copy_node(source: rcld)
       insert_node(node: temp)
       nil
     end
@@ -101,8 +101,8 @@ module BST
       queue.enqueue(self)
       until queue.empty?
         node = queue.dequeue
-        queue.enqueue(node.lc) unless node.lc.nil?
-        queue.enqueue(node.rc) unless node.rc.nil?
+        queue.enqueue(node.lcld) unless node.lcld.nil?
+        queue.enqueue(node.rcld) unless node.rcld.nil?
         yield(node)
       end
 
@@ -116,9 +116,9 @@ module BST
       level = 0 if level.nil?
 
       yield(self, level) if order == :preorder
-      lc&.dfs(order: order, level: level, &block)
+      lcld&.dfs(order: order, level: level, &block)
       yield(self, level) if order == :inorder
-      rc&.dfs(order: order, level: level, &block)
+      rcld&.dfs(order: order, level: level, &block)
       yield(self, level) if order == :postorder
 
       self
@@ -129,20 +129,20 @@ module BST
       level += 1 unless level.nil?
       level = 0 if level.nil?
 
-      lc&.pp(prefix: ch_prefix(category, prefix, ' ', '│'),
-             category: :left)
+      lcld&.pp(prefix: ch_prefix(category, prefix, ' ', '│'),
+               category: :left)
 
       puts node_msg(category, prefix)
 
-      rc&.pp(prefix: ch_prefix(category, prefix, '│', ' '),
-             category: :right)
+      rcld&.pp(prefix: ch_prefix(category, prefix, '│', ' '),
+               category: :right)
     end
 
-    def ch_prefix(category, prefix, lch, rch)
+    def ch_prefix(category, prefix, lcld, rcld)
       # use by bst pretty_print
       msg = {
-        left: ->(prefix) { "#{prefix}#{lch}   " },
-        right: ->(prefix) { "#{prefix}#{rch}   " }
+        left: ->(prefix) { "#{prefix}#{lcld}   " },
+        right: ->(prefix) { "#{prefix}#{rcld}   " }
       }
       msg[category].call(prefix)
     end

@@ -92,7 +92,7 @@ module BST
       consolidate_children(node: root)
 
       self.root = nil if root.leaf?
-      self.root = root.rc.nil? ? root.lc : root.rc unless root.nil?
+      self.root = root.rcld.nil? ? root.lcld : root.rcld unless root.nil?
       -1
     end
 
@@ -100,34 +100,34 @@ module BST
       # called by delete
       return nil unless node.child_count == 2
 
-      node.rc.insert_node(node: node.lc)
-      node.lc = nil
+      node.rcld.insert_node(node: node.lcld)
+      node.lcld = nil
     end
 
     def prune_leaf(parent: nil, node: nil)
       # called by delete
-      parent.lc = nil if parent.lc == node
-      parent.rc = nil if parent.rc == node
+      parent.lcld = nil if parent.lcld == node
+      parent.rcld = nil if parent.rcld == node
 
       -1
     end
 
     def select_child_node(node: nil, value: nil)
       # called by delete
-      return node.lc if node.rc.nil?
-      return node.rc if node.lc.nil?
+      return node.lcld if node.rcld.nil?
+      return node.rcld if node.lcld.nil?
 
-      node.lc.value == value ? node.lc : node.rc
+      node.lcld.value == value ? node.lcld : node.rcld
     end
 
     def dereference_node(parent: nil, node: nil)
       # called by delete
-      if parent.lc == node
-        parent.lc = node.lc if node.rc.nil?
-        parent.lc = node.rc if node.lc.nil?
+      if parent.lcld == node
+        parent.lcld = node.lcld if node.rcld.nil?
+        parent.lcld = node.rcld if node.lcld.nil?
       else
-        parent.rc = node.lc if node.rc.nil?
-        parent.rc = node.rc if node.lc.nil?
+        parent.rcld = node.lcld if node.rcld.nil?
+        parent.rcld = node.rcld if node.lcld.nil?
       end
       -1
     end
@@ -181,8 +181,8 @@ module BST
       return true if root.leaf?
 
       root.bfs do |node|
-        lhs = node.lc.nil? ? -1 : node.lc.node_height
-        rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
+        lhs = node.lcld.nil? ? -1 : node.lcld.node_height
+        rhs = node.rcld.nil? ? -1 : node.rcld.node_height || 0
         return false unless (lhs - rhs).abs <= 1
       end
 
@@ -197,8 +197,8 @@ module BST
         count += 1
         root.dfs(order: :preorder) do |node|
           sub_tree_heights = []
-          sub_tree_heights << (node.lc.nil? ? -1 : node.lc.node_height)
-          sub_tree_heights << (node.rc.nil? ? -1 : node.rc.node_height)
+          sub_tree_heights << (node.lcld.nil? ? -1 : node.lcld.node_height)
+          sub_tree_heights << (node.rcld.nil? ? -1 : node.rcld.node_height)
 
           rotate_sub_tree_left(node: node, sub_tree_heights: sub_tree_heights)
           rotate_sub_tree_right(node: node, sub_tree_heights: sub_tree_heights)
@@ -243,8 +243,8 @@ module BST
       return nil if empty?
 
       root.bfs do |node|
-        return node if !node.lc.nil? && node.lc.value == value
-        return node if !node.rc.nil? && node.rc.value == value
+        return node if !node.lcld.nil? && node.lcld.value == value
+        return node if !node.rcld.nil? && node.rcld.value == value
       end
 
       nil
