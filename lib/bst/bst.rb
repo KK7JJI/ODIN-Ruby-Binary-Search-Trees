@@ -192,26 +192,29 @@ module BST
     def rebalance
       return nil if empty?
 
-      root.dfs(order: :preorder) do |node|
-        lhs = node.lc.nil? ? -1 : node.lc.node_height
-        rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
+      count = 0
+      until balanced?
+        count += 1
+        root.dfs(order: :preorder) do |node|
+          lhs = node.lc.nil? ? -1 : node.lc.node_height
+          rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
 
-        delta = rhs > lhs ? rhs - lhs : 0
-        rotate = delta.abs / 2
+          delta = rhs > lhs ? rhs - lhs : 0
+          rotate = delta.abs / 2
 
-        rotate.times do
-          node.rotate_left
-        end
+          rotate.times do
+            node.rotate_left
+          end
 
-        delta = lhs > rhs ? lhs - rhs : 0
-        rotate = delta.abs / 2
+          delta = lhs > rhs ? lhs - rhs : 0
+          rotate = delta.abs / 2
 
-        rotate.times do
-          node.rotate_right
+          rotate.times do
+            node.rotate_right
+          end
         end
       end
-
-      nil
+      count
     end
 
     def empty?
