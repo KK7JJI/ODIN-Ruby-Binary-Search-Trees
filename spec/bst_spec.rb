@@ -22,6 +22,7 @@ describe BST::BST do
           bst.build_tree(arr: [0])
           result = unloader.call(bst)
           expect(result).to eql([0])
+          expect(bst.size).to eql(1)
         end
 
         it 'load values - level 1' do
@@ -32,6 +33,7 @@ describe BST::BST do
           arr = [5, 15, 10] if name == :postorder
           arr = [10, 5, 15] if name == :levelorder
           expect(result).to eql(arr)
+          expect(bst.size).to eql(3)
         end
 
         it 'load values - level 2' do
@@ -42,6 +44,7 @@ describe BST::BST do
           arr = [2, 6, 5, 12, 16, 15, 10] if name == :postorder
           arr = [10, 5, 15, 2, 6, 12, 16] if name == :levelorder
           expect(result).to eql(arr)
+          expect(bst.size).to eql(7)
         end
 
         let(:arr_load) do
@@ -82,13 +85,13 @@ describe BST::BST do
 
       context "load with #insert, view #{name}" do
         it 'load values - first value' do
-          bst.insert(value: 0)
+          expect { bst.insert(value: 0) }.to change { bst.size }.by(1)
           result = unloader.call(bst)
           expect(result).to eql([0])
         end
         it 'load values - level 1' do
           [10, 5, 15].each do |i|
-            bst.insert(value: i)
+            expect { bst.insert(value: i) }.to change { bst.size }.by(1)
           end
           result = unloader.call(bst)
           arr = [5, 10, 15] if name == :inorder
@@ -99,7 +102,7 @@ describe BST::BST do
         end
         it 'load values - level 2' do
           [10, 5, 15, 2, 6, 12, 16].each do |i|
-            bst.insert(value: i)
+            expect { bst.insert(value: i) }.to change { bst.size }.by(1)
           end
           result = unloader.call(bst)
           arr = [2, 5, 6, 10, 12, 15, 16] if name == :inorder
@@ -222,17 +225,20 @@ describe BST::BST do
   end
 
   describe '#delete' do
-    it 'returns nil against an empty tree.' do
-      expect(bst.delete(value: 0)).to be_nil
+    it 'size = 0 when run against an empty tree.' do
+      bst.delete(value: 0)
+      expect(bst.size).to eql(0)
+      expect(bst.inorder.to_a).to eql([])
     end
-    it 'returns nil when value is not found in tree.' do
+    it 'size unchanged when value is not found in tree.' do
       bst.insert(value: 0)
-      expect(bst.delete(value: 1)).to be_nil
+      bst.delete(value: 1)
+      expect(bst.size).to eql(1)
       expect(bst.inorder.to_a).to eql([0])
     end
-    it 'deletes root node when it is the only node present' do
+    it 'decrement size when root node deleted' do
       bst.insert(value: 0)
-      expect(bst.delete(value: 0)).to be_nil
+      expect { bst.delete(value: 0) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([])
       expect(bst).to be_empty
     end
@@ -240,39 +246,39 @@ describe BST::BST do
       bst.insert(value: 10)
       bst.insert(value: 5)
       expect(bst.inorder.to_a).to eql([5, 10])
-      bst.delete(value: 10)
+      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5])
     end
     it 'deletes root node, right node is promoted' do
       bst.insert(value: 10)
       bst.insert(value: 15)
       expect(bst.inorder.to_a).to eql([10, 15])
-      bst.delete(value: 10)
+      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15])
     end
     it 'deletes level 1 leaves' do
       bst.build_tree(arr: [10, 5, 15])
-      bst.delete(value: 5)
+      expect { bst.delete(value: 5) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 15])
-      bst.delete(value: 15)
+      expect { bst.delete(value: 15) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10])
     end
     it 'deletes level 2 leaves' do
       bst.build_tree(arr: [20, 10, 5, 15, 30, 25, 35])
-      bst.delete(value: 35)
+      expect { bst.delete(value: 35) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 25, 30])
-      bst.delete(value: 25)
+      expect { bst.delete(value: 25) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 30])
-      bst.delete(value: 5)
+      expect { bst.delete(value: 5) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 15, 20, 30])
-      bst.delete(value: 15)
+      expect { bst.delete(value: 15) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 20, 30])
     end
     it 'deletes level 1 nodes preserving leaves' do
       bst.build_tree(arr: [20, 10, 15, 30, 25])
-      bst.delete(value: 10)
+      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15, 20, 25, 30])
-      bst.delete(value: 30)
+      expect { bst.delete(value: 30) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15, 20, 25])
     end
     it 'delete all nodes randomly' do

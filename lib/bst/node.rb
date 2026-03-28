@@ -19,18 +19,18 @@ module BST
     end
 
     def insert_node(node: nil)
-      # return Node.new(value: set_value)
-
       if node.value < value
-        lc&.insert_node(node: node)
+        result = lc&.insert_node(node: node)
+        result = 1 if lc.nil?
         self.lc = node if lc.nil?
       elsif node.value > value
-        rc&.insert_node(node: node)
+        result = rc&.insert_node(node: node)
+        result = 1 if rc.nil?
         self.rc = node if rc.nil?
+      else
+        result = 0
       end
-
-      # duplicate values are not permitted in this BST.
-      nil
+      result
     end
 
     def child_count
