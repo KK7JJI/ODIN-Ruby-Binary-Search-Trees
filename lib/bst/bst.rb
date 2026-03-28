@@ -196,25 +196,37 @@ module BST
       until balanced?
         count += 1
         root.dfs(order: :preorder) do |node|
-          lhs = node.lc.nil? ? -1 : node.lc.node_height
-          rhs = node.rc.nil? ? -1 : node.rc.node_height || 0
+          sub_tree_heights = []
+          sub_tree_heights << (node.lc.nil? ? -1 : node.lc.node_height)
+          sub_tree_heights << (node.rc.nil? ? -1 : node.rc.node_height)
 
-          delta = rhs > lhs ? rhs - lhs : 0
-          rotate = delta.abs / 2
-
-          rotate.times do
-            node.rotate_left
-          end
-
-          delta = lhs > rhs ? lhs - rhs : 0
-          rotate = delta.abs / 2
-
-          rotate.times do
-            node.rotate_right
-          end
+          rotate_sub_tree_left(node: node, sub_tree_heights: sub_tree_heights)
+          rotate_sub_tree_right(node: node, sub_tree_heights: sub_tree_heights)
         end
       end
       count
+    end
+
+    def rotate_sub_tree_left(node: nil, sub_tree_heights: [])
+      lhs, rhs = sub_tree_heights
+
+      delta = rhs > lhs ? rhs - lhs : 0
+      rotate = delta.abs / 2
+
+      rotate.times do
+        node.rotate_left
+      end
+    end
+
+    def rotate_sub_tree_right(node: nil, sub_tree_heights: [])
+      lhs, rhs = sub_tree_heights
+
+      delta = lhs > rhs ? lhs - rhs : 0
+      rotate = delta.abs / 2
+
+      rotate.times do
+        node.rotate_right
+      end
     end
 
     def empty?
