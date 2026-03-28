@@ -46,54 +46,70 @@ module BST
       nil
     end
 
-    def delete_root_node
+    def dereference_root_node
+      consolidate_children(node: root)
+
       return self.root = nil if root.leaf?
 
-      if root.child_count == 2
-        root.rc.insert_node(node: root.lc)
-        root.lc = nil
-      end
-
-      return self.root = root.lc if root.rc.nil?
-
-      self.root = root.rc if root.lc.nil?
-
+      self.root = root.rc.nil? ? root.lc : root.rc
       nil
+    end
+
+    def consolidate_children(node: nil)
+      return nil unless node.child_count == 2
+
+      node.rc.insert_node(node: node.lc)
+      node.lc = nil
     end
 
     def delete(value: nil)
       return nil if empty?
       return nil if value.nil?
 
-      parent = find_parent(value: value)
-      node = find(value: value) if parent.nil?
-      return nil if node.nil? && parent.nil?
-      return delete_root_node if parent.nil?
+      parent, node = find_parent_and_child(value: value)
 
-      del_node = parent.lc if parent.rc.nil?
-      del_node = parent.rc if parent.lc.nil?
-      del_node ||= parent.lc.value == value ? parent.lc : parent.rc
+      return nil if node.nil?
+      return dereference_root_node if parent.nil?
 
-      if del_node.leaf?
-        parent.lc = nil if parent.lc == del_node
-        parent.rc = nil if parent.rc == del_node
-        return nil
-      end
+      del_node = select_child_node(node: parent, value: value)
+      return nil if prune_leaf(parent: parent, node: del_node)
 
-      if del_node.child_count == 2
-        del_node.rc.insert_node(node: del_node.lc)
-        del_node.lc = nil
-      end
-
-      if parent.lc == del_node
-        parent.lc = del_node.lc if del_node.rc.nil?
-        parent.lc = del_node.rc if del_node.lc.nil?
-      else
-        parent.rc = del_node.lc if del_node.rc.nil?
-        parent.rc = del_node.rc if del_node.lc.nil?
-      end
+      consolidate_children(node: del_node)
+      dereference_node(parent: parent, node: del_node)
 
       nil
+    end
+
+    def find_parent_and_child(value: nil)
+      parent = find_parent(value: value)
+      node = find(value: value)
+      [parent, node]
+    end
+
+    def prune_leaf(parent: nil, node: nil)
+      return nil unless node.leaf?
+
+      parent.lc = nil if parent.lc == node
+      parent.rc = nil if parent.rc == node
+
+      node
+    end
+
+    def select_child_node(node: nil, value: nil)
+      return node.lc if node.rc.nil?
+      return node.rc if node.lc.nil?
+
+      node.lc.value == value ? node.lc : node.rc
+    end
+
+    def dereference_node(parent: nil, node: nil)
+      if parent.lc == node
+        parent.lc = node.lc if node.rc.nil?
+        parent.lc = node.rc if node.lc.nil?
+      else
+        parent.rc = node.lc if node.rc.nil?
+        parent.rc = node.rc if node.lc.nil?
+      end
     end
 
     def level_order
