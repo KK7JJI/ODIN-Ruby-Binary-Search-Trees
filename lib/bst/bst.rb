@@ -31,6 +31,7 @@ module BST
 
     def clear
       self.root = nil
+      self.size = 0
     end
 
     def pretty_print
@@ -192,23 +193,26 @@ module BST
     def rebalance
       return nil if empty?
 
-      count = 0
-      until balanced?
-        count += 1
-        root.dfs(order: :preorder) do |node|
-          sub_tree_heights = []
-          sub_tree_heights << (node.lcld.nil? ? -1 : node.lcld.node_height)
-          sub_tree_heights << (node.rcld.nil? ? -1 : node.rcld.node_height)
+      reload_bst
 
-          rotate_sub_tree_left(node: node, sub_tree_heights: sub_tree_heights)
-          rotate_sub_tree_right(node: node, sub_tree_heights: sub_tree_heights)
-        end
+      root.dfs(order: :preorder) do |node|
+        subtree_heights = []
+        subtree_heights << (node.lcld.nil? ? -1 : node.lcld.node_height)
+        subtree_heights << (node.rcld.nil? ? -1 : node.rcld.node_height)
+
+        rotate_subtree_left(node: node, subtree_heights: subtree_heights)
+        rotate_subtree_right(node: node, subtree_heights: subtree_heights)
       end
-      count
     end
 
-    def rotate_sub_tree_left(node: nil, sub_tree_heights: [])
-      lhs, rhs = sub_tree_heights
+    def reload_bst
+      arr = inorder.to_a
+      clear
+      build_tree(arr: arr)
+    end
+
+    def rotate_subtree_left(node: nil, subtree_heights: [])
+      lhs, rhs = subtree_heights
 
       delta = rhs > lhs ? rhs - lhs : 0
       rotate = delta.abs / 2
@@ -218,8 +222,8 @@ module BST
       end
     end
 
-    def rotate_sub_tree_right(node: nil, sub_tree_heights: [])
-      lhs, rhs = sub_tree_heights
+    def rotate_subtree_right(node: nil, subtree_heights: [])
+      lhs, rhs = subtree_heights
 
       delta = lhs > rhs ? lhs - rhs : 0
       rotate = delta.abs / 2
