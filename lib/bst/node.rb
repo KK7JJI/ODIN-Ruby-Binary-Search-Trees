@@ -54,46 +54,6 @@ module BST
       2
     end
 
-    def copy_node(source: nil)
-      self.value = source.value
-      self.rcld = source.rcld
-      self.lcld = source.lcld
-    end
-
-    def promote_left?
-      return false if lcld.nil?
-      return true if rcld.nil?
-      return true if lcld.node_height > rcld.node_height
-
-      false
-    end
-
-    def promote_right?
-      return false if rcld.nil?
-      return true if lcld.nil?
-      return true if rcld.node_height >= lcld.node_height
-
-      false
-    end
-
-    def rotate_right
-      return nil if lcld.nil?
-
-      temp = Node.new(value: value, rcld: rcld, lcld: nil)
-      copy_node(source: lcld)
-      node_insert(new_node: temp)
-      nil
-    end
-
-    def rotate_left
-      return nil if rcld.nil?
-
-      temp = Node.new(value: value, rcld: nil, lcld: lcld)
-      copy_node(source: rcld)
-      node_insert(new_node: temp)
-      nil
-    end
-
     def node_height
       height = 0
       dfs.to_a.map { |_node, level| height = level if level > height }
@@ -125,78 +85,76 @@ module BST
     def dfs(order: :preorder, &block)
       return enum_for(:dfs, order: order) unless block
 
-      if order == :preorder
-        stack = []
-        self.depth = 0
-        stack.push(self)
-        until stack.empty?
-          node = stack.pop
-          # increment child node depths and save them to stack
-          new_depth = node.depth + 1
-          node.rcld.depth = new_depth unless node.rcld.nil?
-          node.lcld.depth = new_depth unless node.lcld.nil?
-          stack.push(node.rcld) unless node.rcld.nil?
-          stack.push(node.lcld) unless node.lcld.nil?
-          yield(node, node.depth)
-        end
-      end
-
-      if order == :postorder
-        stack = []
-        postorder = []
-
-        self.depth = 0
-        stack.push(self)
-        until stack.empty?
-          node = stack.pop
-          postorder << node
-          # increment child node depths and save them to stack
-          node.lcld.depth = node.depth + 1 unless node.lcld.nil?
-          node.rcld.depth = node.depth + 1 unless node.rcld.nil?
-          stack.push(node.lcld) unless node.lcld.nil?
-          stack.push(node.rcld) unless node.rcld.nil?
-        end
-
-        until postorder.empty?
-          node = postorder.pop
-          yield(node, node.depth)
-        end
-      end
-
-      if order == :inorder
-        stack = []
-        node = self
-        node.depth = 0
-
-        until stack.empty? && node.nil?
-          until node.nil?
-            node.lcld.depth = node.depth + 1 unless node.lcld.nil?
-            stack.push(node)
-            node = node.lcld
-          end
-          node = stack.pop
-          yield(node, node.depth)
-          node.rcld.depth = node.depth + 1 unless node.rcld.nil?
-          node = node.rcld
-        end
-      end
-      self
+      dfs_handler[order].call(&block)
     end
 
-    # def dfs(order: :inorder, level: nil, &block)
-    #   return enum_for(:dfs, order: order, level: level) unless block
+    def dfs_handler
+      { preorder: method(:dfs_preorder),
+        postorder: method(:dfs_postorder),
+        inorder: method(:dfs_inorder) }
+    end
 
-    #   level += 1 unless level.nil?
-    #   level = 0 if level.nil?
+    def dfs_preorder(&block)
+      return enum_for(:dfs) unless block
 
-    #   yield(self, level) if order == :preorder
-    #   lcld&.dfs(order: order, level: level, &block)
-    #   yield(self, level) if order == :inorder
-    #   rcld&.dfs(order: order, level: level, &block)
-    #   yield(self, level) if order == :postorder
+      stack = []
+      self.depth = 0
+      stack.push(self)
+      until stack.empty?
+        node = stack.pop
+        # increment child node depths and save them to stack
+        new_depth = node.depth + 1
+        node.rcld.depth = new_depth unless node.rcld.nil?
+        node.lcld.depth = new_depth unless node.lcld.nil?
+        stack.push(node.rcld) unless node.rcld.nil?
+        stack.push(node.lcld) unless node.lcld.nil?
+        yield(node, node.depth)
+      end
+    end
 
-    #   self
-    # end
+    def dfs_postorder(&block)
+      return enum_for(:dfs) unless block
+
+      stack = []
+      postorder = []
+
+      self.depth = 0
+      stack.push(self)
+      until stack.empty?
+        node = stack.pop
+        postorder << node
+        # increment child node depths and save them to stack
+        node.lcld.depth = node.depth + 1 unless node.lcld.nil?
+        node.rcld.depth = node.depth + 1 unless node.rcld.nil?
+        stack.push(node.lcld) unless node.lcld.nil?
+        stack.push(node.rcld) unless node.rcld.nil?
+      end
+
+      until postorder.empty?
+        node = postorder.pop
+        yield(node, node.depth)
+      end
+    end
+
+    def dfs_inorder(&block)
+      return enum_for(:dfs) unless block
+
+      stack = []
+      node = self
+      node.depth = 0
+
+      until stack.empty? && node.nil?
+        until node.nil?
+          node.lcld.depth = node.depth + 1 unless node.lcld.nil?
+          stack.push(node)
+          node = node.lcld
+        end
+        node = stack.pop
+        yield(node, node.depth)
+        node.rcld.depth = node.depth + 1 unless node.rcld.nil?
+        node = node.rcld
+      end
+    end
 
     def pp(category: :right, prefix: '')
       # use by bst pretty_print

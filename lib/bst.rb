@@ -13,7 +13,7 @@ end
 
 puts 'Create new binary search tree'
 bst = BST::BST.new
-n = 10_000
+n = 100
 
 # arr = (0...n).to_a
 arr = []
