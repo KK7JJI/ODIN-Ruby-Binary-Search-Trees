@@ -25,7 +25,8 @@ module BST
         self.root = new_node
         self.size += 1
       else
-        self.size += root&.insert_node(node: new_node)
+        # self.size += root&.insert_node(node: new_node)
+        self.size += root&.node_insert(new_node: new_node)
       end
     end
 
@@ -101,7 +102,8 @@ module BST
       # called by delete
       return nil unless node.child_count == 2
 
-      node.rcld.insert_node(node: node.lcld)
+      # node.rcld.insert_node(node: node.lcld)
+      node.rcld.node_insert(new_node: node.lcld)
       node.lcld = nil
     end
 
@@ -142,19 +144,19 @@ module BST
     def inorder
       return nil if empty?
 
-      root.dfs(order: :inorder).to_a.map { |node, _level| node.value }
+      root.dfs2(order: :inorder).to_a.map { |node, _level| node.value }
     end
 
     def preorder
       return nil if empty?
 
-      root.dfs(order: :preorder).to_a.map { |node, _level| node.value }
+      root.dfs2(order: :preorder).to_a.map { |node, _level| node.value }
     end
 
     def postorder
       return nil if empty?
 
-      root.dfs(order: :postorder).to_a.map { |node, _level| node.value }
+      root.dfs2(order: :postorder).to_a.map { |node, _level| node.value }
     end
 
     def height(value: nil)
@@ -191,47 +193,71 @@ module BST
     end
 
     def rebalance
-      return nil if empty?
-
-      reload_bst
-
-      root.dfs(order: :preorder) do |node|
-        subtree_heights = []
-        subtree_heights << (node.lcld.nil? ? -1 : node.lcld.node_height)
-        subtree_heights << (node.rcld.nil? ? -1 : node.rcld.node_height)
-
-        rotate_subtree_left(node: node, subtree_heights: subtree_heights)
-        rotate_subtree_right(node: node, subtree_heights: subtree_heights)
-      end
-    end
-
-    def reload_bst
       arr = inorder.to_a
       clear
-      build_tree(arr: arr)
+      rebuild_tree(arr: arr)
     end
 
-    def rotate_subtree_left(node: nil, subtree_heights: [])
-      lhs, rhs = subtree_heights
+    def rebuild_tree(arr: nil)
+      puts __method__
+      puts arr.inspect
+      return nil if arr.length.zero?
 
-      delta = rhs > lhs ? rhs - lhs : 0
-      rotate = delta.abs / 2
+      insert(value: arr[0]) if arr.length == 1
 
-      rotate.times do
-        node.rotate_left
-      end
+      mid = arr.length / 2
+      insert(value: arr[mid])
+
+      arr_left = arr.slice(0...mid)
+      rebuild_tree(arr: arr_left)
+      arr_right = arr.slice((mid + 1)...arr.length)
+      rebuild_tree(arr: arr_right)
     end
+    # def rebalance
+    #   return nil if empty?
 
-    def rotate_subtree_right(node: nil, subtree_heights: [])
-      lhs, rhs = subtree_heights
+    #   reload_bst
 
-      delta = lhs > rhs ? lhs - rhs : 0
-      rotate = delta.abs / 2
+    #   root.dfs(order: :preorder) do |node|
+    #     subtree_heights = []
+    #     subtree_heights << (node.lcld.nil? ? -1 : node.lcld.node_height)
+    #     subtree_heights << (node.rcld.nil? ? -1 : node.rcld.node_height)
+    #     puts "value: #{node.value} lc: #{subtree_heights[0]}, rc: #{subtree_heights[1]}"
 
-      rotate.times do
-        node.rotate_right
-      end
-    end
+    #     rotate_subtree_left(node: node, subtree_heights: subtree_heights)
+    #     rotate_subtree_right(node: node, subtree_heights: subtree_heights)
+    #   end
+    # end
+
+    # def reload_bst
+    #   arr = inorder.to_a
+    #   puts arr.inspect
+    #   clear
+    #   build_tree(arr: arr)
+    #   pretty_print
+    # end
+
+    # def rotate_subtree_left(node: nil, subtree_heights: [])
+    #   lhs, rhs = subtree_heights
+
+    #   delta = rhs > lhs ? rhs - lhs : 0
+    #   rotate = delta.abs / 2
+
+    #   rotate.times do
+    #     node.rotate_left
+    #   end
+    # end
+
+    # def rotate_subtree_right(node: nil, subtree_heights: [])
+    #   lhs, rhs = subtree_heights
+
+    #   delta = lhs > rhs ? lhs - rhs : 0
+    #   rotate = delta.abs / 2
+
+    #   rotate.times do
+    #     node.rotate_right
+    #   end
+    # end
 
     def empty?
       return true if root.nil?
