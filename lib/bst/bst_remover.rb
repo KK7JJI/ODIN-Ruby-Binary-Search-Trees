@@ -3,12 +3,17 @@
 # project namespace
 module BST
   # binary search tree node delete
+
   class BSTRemover
+    include BSTEnum
+
     def delete(bst, arg)
       delete_count = 0
       delete_count += delete_node(bst: bst, value: arg)
       delete_count
     end
+
+    private
 
     def delete_node(bst: nil, value: nil)
       return 0 if bst.empty?
@@ -43,14 +48,14 @@ module BST
     def find(bst: nil, value: nil)
       return nil if bst.empty?
 
-      bst.root.bfs { |node| return node if node.value == value }
+      bfs(start_node: bst.root) { |node| return node if node.value == value }
       nil
     end
 
     def find_parent(bst: nil, value: nil)
       return nil if bst.empty?
 
-      bst.root.bfs do |node|
+      bfs(start_node: bst.root) do |node|
         return node if !node.lcld.nil? && node.lcld.value == value
         return node if !node.rcld.nil? && node.rcld.value == value
       end

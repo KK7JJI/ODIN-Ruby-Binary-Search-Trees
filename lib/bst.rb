@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require_relative 'bst/queue'
+require_relative 'bst/bst_enum'
 require_relative 'bst/node'
 require_relative 'bst/bst'
 require_relative 'bst/bst_adder'

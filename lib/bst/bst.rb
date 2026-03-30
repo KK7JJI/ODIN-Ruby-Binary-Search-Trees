@@ -4,6 +4,8 @@
 module BST
   # binary search tree
   class BST
+    include BSTEnum
+
     attr_accessor :size, :root
 
     def initialize(root: nil)
@@ -35,39 +37,39 @@ module BST
     def include?(value)
       return false if empty?
 
-      root.bfs { |node| return true if node.value == value }
+      bfs(start_node: root) { |node| return true if node.value == value }
       false
     end
 
     def find(value: nil)
       return nil if empty?
 
-      root.bfs { |node| return node if node.value == value }
+      bfs(start_node: root) { |node| return node if node.value == value }
       nil
     end
 
     def level_order
       return nil if empty?
 
-      root.bfs.to_a.map(&:value)
+      bfs(start_node: root).to_a.map(&:value)
     end
 
     def inorder
       return nil if empty?
 
-      root.dfs(order: :inorder).to_a.map { |node, _level| node.value }
+      dfs(start_node: root, order: :inorder).to_a.map { |node, _level| node.value }
     end
 
     def preorder
       return nil if empty?
 
-      root.dfs(order: :preorder).to_a.map { |node, _level| node.value }
+      dfs(start_node: root, order: :preorder).to_a.map { |node, _level| node.value }
     end
 
     def postorder
       return nil if empty?
 
-      root.dfs(order: :postorder).to_a.map { |node, _level| node.value }
+      dfs(start_node: root, order: :postorder).to_a.map { |node, _level| node.value }
     end
 
     def height(value: nil)
@@ -94,7 +96,7 @@ module BST
       return true if empty?
       return true if root.leaf?
 
-      root.bfs do |node|
+      bfs(start_node: root) do |node|
         lhs = node.lcld.nil? ? -1 : node.lcld.node_height
         rhs = node.rcld.nil? ? -1 : node.rcld.node_height || 0
         return false unless (lhs - rhs).abs <= 1

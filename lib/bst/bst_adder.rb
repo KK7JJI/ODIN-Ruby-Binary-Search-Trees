@@ -10,6 +10,8 @@ module BST
       insert_count
     end
 
+    private
+
     def build_tree(bst: nil, arr: nil)
       insert_count = 0
       arr.each do |value|
