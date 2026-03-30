@@ -11,11 +11,9 @@ def pp(bst)
   puts ''
 end
 
-return
-
 puts 'Create new binary search tree'
 bst = BST::BST.new
-n = 10
+n = 10_000
 
 # arr = (0...n).to_a
 arr = []
