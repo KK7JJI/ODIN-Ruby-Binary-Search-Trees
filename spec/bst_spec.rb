@@ -305,16 +305,14 @@ describe BST::BST do
     it 'balance? returns true on empty tree' do
       expect(bst).to be_balanced
     end
-    it 'rebalance returns nil on empty tree' do
-      expect(bst.rebalance).to be_nil
-    end
     it 'a one node tree is balanced.' do
       bst.build_tree(arr: [0])
       expect(bst).to be_balanced
     end
-    it 'rebalancing a one node tree returns nil.' do
+    it 'rebalancing a one node tree.' do
       bst.build_tree(arr: [0])
-      expect(bst.rebalance).to be_nil
+      bst.rebalance
+      expect(bst.inorder.to_a).to eql([0])
     end
     it 'rebalance - degenerate (right) 3 node tree' do
       bst.build_tree(arr: [0, 5, 10])

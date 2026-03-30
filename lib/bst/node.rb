@@ -20,21 +20,6 @@ module BST
       true
     end
 
-    # def insert_node(node: nil)
-    #   if node.value < value
-    #     result = lcld&.insert_node(node: node)
-    #     result = 1 if lcld.nil?
-    #     self.lcld = node if lcld.nil?
-    #   elsif node.value > value
-    #     result = rcld&.insert_node(node: node)
-    #     result = 1 if rcld.nil?
-    #     self.rcld = node if rcld.nil?
-    #   else
-    #     result = 0
-    #   end
-    #   result
-    # end
-
     def node_insert(new_node: nil)
       cur_location = self
       inserted = false
@@ -96,7 +81,6 @@ module BST
 
       temp = Node.new(value: value, rcld: rcld, lcld: nil)
       copy_node(source: lcld)
-      # insert_node(node: temp)
       node_insert(new_node: temp)
       nil
     end
@@ -106,20 +90,19 @@ module BST
 
       temp = Node.new(value: value, rcld: nil, lcld: lcld)
       copy_node(source: rcld)
-      # insert_node(node: temp)
       node_insert(new_node: temp)
       nil
     end
 
     def node_height
       height = 0
-      dfs2.to_a.map { |_node, level| height = level if level > height }
+      dfs.to_a.map { |_node, level| height = level if level > height }
       height
     end
 
     def node_depth(ref_node: nil)
       depth = nil # remains nil if value not found.
-      ref_node.dfs2 { |node, level| return level if node == self }
+      ref_node.dfs { |node, level| return level if node == self }
       depth
     end
 
@@ -139,8 +122,8 @@ module BST
       self
     end
 
-    def dfs2(order: :preorder, &block)
-      return enum_for(:dfs2, order: order) unless block
+    def dfs(order: :preorder, &block)
+      return enum_for(:dfs, order: order) unless block
 
       if order == :preorder
         stack = []
@@ -200,20 +183,20 @@ module BST
       self
     end
 
-    def dfs(order: :inorder, level: nil, &block)
-      return enum_for(:dfs, order: order, level: level) unless block
+    # def dfs(order: :inorder, level: nil, &block)
+    #   return enum_for(:dfs, order: order, level: level) unless block
 
-      level += 1 unless level.nil?
-      level = 0 if level.nil?
+    #   level += 1 unless level.nil?
+    #   level = 0 if level.nil?
 
-      yield(self, level) if order == :preorder
-      lcld&.dfs(order: order, level: level, &block)
-      yield(self, level) if order == :inorder
-      rcld&.dfs(order: order, level: level, &block)
-      yield(self, level) if order == :postorder
+    #   yield(self, level) if order == :preorder
+    #   lcld&.dfs(order: order, level: level, &block)
+    #   yield(self, level) if order == :inorder
+    #   rcld&.dfs(order: order, level: level, &block)
+    #   yield(self, level) if order == :postorder
 
-      self
-    end
+    #   self
+    # end
 
     def pp(category: :right, prefix: '')
       # use by bst pretty_print
