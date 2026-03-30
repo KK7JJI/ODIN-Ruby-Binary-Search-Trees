@@ -228,19 +228,19 @@ describe BST::BST do
 
   describe '#delete' do
     it 'size = 0 when run against an empty tree.' do
-      bst.delete(value: 0)
+      bst.delete(0)
       expect(bst.size).to eql(0)
       expect(bst.inorder.to_a).to eql([])
     end
     it 'size unchanged when value is not found in tree.' do
       bst.insert(0)
-      bst.delete(value: 1)
+      bst.delete(1)
       expect(bst.size).to eql(1)
       expect(bst.inorder.to_a).to eql([0])
     end
     it 'decrement size when root node deleted' do
       bst.insert(0)
-      expect { bst.delete(value: 0) }.to change { bst.size }.by(-1)
+      expect { bst.delete(0) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([])
       expect(bst).to be_empty
     end
@@ -248,39 +248,39 @@ describe BST::BST do
       bst.insert(10)
       bst.insert(5)
       expect(bst.inorder.to_a).to eql([5, 10])
-      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
+      expect { bst.delete(10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5])
     end
     it 'deletes root node, right node is promoted' do
       bst.insert(10)
       bst.insert(15)
       expect(bst.inorder.to_a).to eql([10, 15])
-      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
+      expect { bst.delete(10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15])
     end
     it 'deletes level 1 leaves' do
       bst.insert([10, 5, 15])
-      expect { bst.delete(value: 5) }.to change { bst.size }.by(-1)
+      expect { bst.delete(5) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 15])
-      expect { bst.delete(value: 15) }.to change { bst.size }.by(-1)
+      expect { bst.delete(15) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10])
     end
     it 'deletes level 2 leaves' do
       bst.insert([20, 10, 5, 15, 30, 25, 35])
-      expect { bst.delete(value: 35) }.to change { bst.size }.by(-1)
+      expect { bst.delete(35) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 25, 30])
-      expect { bst.delete(value: 25) }.to change { bst.size }.by(-1)
+      expect { bst.delete(25) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([5, 10, 15, 20, 30])
-      expect { bst.delete(value: 5) }.to change { bst.size }.by(-1)
+      expect { bst.delete(5) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 15, 20, 30])
-      expect { bst.delete(value: 15) }.to change { bst.size }.by(-1)
+      expect { bst.delete(15) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([10, 20, 30])
     end
     it 'deletes level 1 nodes preserving leaves' do
       bst.insert([20, 10, 15, 30, 25])
-      expect { bst.delete(value: 10) }.to change { bst.size }.by(-1)
+      expect { bst.delete(10) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15, 20, 25, 30])
-      expect { bst.delete(value: 30) }.to change { bst.size }.by(-1)
+      expect { bst.delete(30) }.to change { bst.size }.by(-1)
       expect(bst.inorder.to_a).to eql([15, 20, 25])
     end
     it 'delete all nodes randomly' do
@@ -289,7 +289,7 @@ describe BST::BST do
       arr1 = arr.dup
 
       arr.shuffle.each do |i|
-        bst.delete(value: i)
+        bst.delete(i)
         arr1.delete(i)
         arr1.each do |j|
           expect(bst.include?(j)).to eql(true)

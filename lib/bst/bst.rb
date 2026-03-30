@@ -10,10 +10,15 @@ module BST
       @root = root
       @size = 0
       @adder = BSTAdder.new
+      @remover = BSTRemover.new
     end
 
     def insert(arg)
       self.size += @adder.insert(self, arg)
+    end
+
+    def delete(arg)
+      self.size -= @remover.delete(self, arg)
     end
 
     def clear
@@ -39,86 +44,6 @@ module BST
 
       root.bfs { |node| return node if node.value == value }
       nil
-    end
-
-    def delete(value: nil)
-      self.size += delete_node(value: value)
-    end
-
-    def delete_node(value: nil)
-      # called by delete
-      return 0 if empty?
-      return 0 if value.nil?
-
-      parent, node = find_parent_and_child(value: value)
-
-      # node not found in tree
-      return 0 if node.nil?
-
-      # delete root node
-      return dereference_root_node if parent.nil?
-
-      del_node = select_child_node(node: parent, value: value)
-
-      # delete leaf nodes
-      return prune_leaf(parent: parent, node: del_node) if del_node.leaf?
-
-      # delete all other nodes in tree
-      consolidate_children(node: del_node)
-      dereference_node(parent: parent, node: del_node)
-    end
-
-    def find_parent_and_child(value: nil)
-      # called by delete
-      parent = find_parent(value: value)
-      node = find(value: value)
-      [parent, node]
-    end
-
-    def dereference_root_node
-      # called by delete
-      consolidate_children(node: root)
-
-      self.root = nil if root.leaf?
-      self.root = root.rcld.nil? ? root.lcld : root.rcld unless root.nil?
-      -1
-    end
-
-    def consolidate_children(node: nil)
-      # called by delete
-      return nil unless node.child_count == 2
-
-      @adder.insert_node(start_node: node.rcld, new_node: node.lcld)
-      # node.rcld.node_insert(new_node: node.lcld)
-      node.lcld = nil
-    end
-
-    def prune_leaf(parent: nil, node: nil)
-      # called by delete
-      parent.lcld = nil if parent.lcld == node
-      parent.rcld = nil if parent.rcld == node
-
-      -1
-    end
-
-    def select_child_node(node: nil, value: nil)
-      # called by delete
-      return node.lcld if node.rcld.nil?
-      return node.rcld if node.lcld.nil?
-
-      node.lcld.value == value ? node.lcld : node.rcld
-    end
-
-    def dereference_node(parent: nil, node: nil)
-      # called by delete
-      if parent.lcld == node
-        parent.lcld = node.lcld if node.rcld.nil?
-        parent.lcld = node.rcld if node.lcld.nil?
-      else
-        parent.rcld = node.lcld if node.rcld.nil?
-        parent.rcld = node.rcld if node.lcld.nil?
-      end
-      -1
     end
 
     def level_order
@@ -202,19 +127,6 @@ module BST
       return true if root.nil?
 
       false
-    end
-
-    private
-
-    def find_parent(value: nil)
-      return nil if empty?
-
-      root.bfs do |node|
-        return node if !node.lcld.nil? && node.lcld.value == value
-        return node if !node.rcld.nil? && node.rcld.value == value
-      end
-
-      nil
     end
   end
 end

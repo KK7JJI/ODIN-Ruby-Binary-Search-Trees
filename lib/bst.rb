@@ -2,6 +2,7 @@ require_relative 'bst/queue'
 require_relative 'bst/node'
 require_relative 'bst/bst'
 require_relative 'bst/bst_adder'
+require_relative 'bst/bst_remover'
 
 def pp(bst)
   puts '========='
