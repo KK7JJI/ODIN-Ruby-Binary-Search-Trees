@@ -20,33 +20,6 @@ module BST
       true
     end
 
-    def node_insert(new_node: nil)
-      cur_location = self
-      inserted = false
-
-      until inserted
-        if new_node.value < cur_location.value
-          if cur_location.lcld.nil?
-            cur_location.lcld = new_node
-            result = 1
-            inserted = true
-          end
-          cur_location = cur_location.lcld unless cur_location.lcld.nil?
-        elsif new_node.value > cur_location.value
-          if cur_location.rcld.nil?
-            cur_location.rcld = new_node
-            result = 1
-            inserted = true
-          end
-          cur_location = cur_location.rcld unless cur_location.rcld.nil?
-        else
-          result = 0
-          inserted = true
-        end
-      end
-      result
-    end
-
     def child_count
       return 0 if leaf?
       return 1 if lcld.nil? || rcld.nil?

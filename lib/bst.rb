@@ -1,6 +1,7 @@
 require_relative 'bst/queue'
 require_relative 'bst/node'
 require_relative 'bst/bst'
+require_relative 'bst/bst_adder'
 
 def pp(bst)
   puts '========='
@@ -22,7 +23,7 @@ while arr.length < n
   arr = arr.uniq
 end
 
-bst.build_tree(arr: arr.sort)
+bst.insert(arr.sort)
 
 balance_state = bst.balanced? ? 'balanced' : 'not balanced'
 puts "Binary Search tree w/ #{bst.size} nodes is #{balance_state}."
@@ -42,7 +43,7 @@ while arr.length < n + n
   arr = arr.uniq
 end
 arr.each do |i|
-  bst.insert(value: i)
+  bst.insert(i)
 end
 balance_state = bst.balanced? ? 'balanced' : 'not balanced'
 puts "Binary Search tree w/ #{bst.size} nodes is #{balance_state}."

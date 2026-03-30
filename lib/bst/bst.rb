@@ -4,30 +4,16 @@
 module BST
   # binary search tree
   class BST
-    attr_accessor :size
+    attr_accessor :size, :root
 
     def initialize(root: nil)
       @root = root
       @size = 0
+      @adder = BSTAdder.new
     end
 
-    def build_tree(arr: nil)
-      arr.each do |value|
-        insert(value: value)
-      end
-
-      root
-    end
-
-    def insert(value: nil)
-      new_node = Node.new(value: value)
-      if root.nil?
-        self.root = new_node
-        self.size += 1
-      else
-        # self.size += root&.insert_node(node: new_node)
-        self.size += root&.node_insert(new_node: new_node)
-      end
+    def insert(arg)
+      self.size += @adder.insert(self, arg)
     end
 
     def clear
@@ -102,8 +88,8 @@ module BST
       # called by delete
       return nil unless node.child_count == 2
 
-      # node.rcld.insert_node(node: node.lcld)
-      node.rcld.node_insert(new_node: node.lcld)
+      @adder.insert_node(start_node: node.rcld, new_node: node.lcld)
+      # node.rcld.node_insert(new_node: node.lcld)
       node.lcld = nil
     end
 
@@ -201,10 +187,10 @@ module BST
     def rebuild_tree(arr: nil)
       return nil if arr.length.zero?
 
-      insert(value: arr[0]) if arr.length == 1
+      insert(arr[0]) if arr.length == 1
 
       mid = arr.length / 2
-      insert(value: arr[mid])
+      insert(arr[mid])
 
       arr_left = arr.slice(0...mid)
       rebuild_tree(arr: arr_left)
@@ -219,8 +205,6 @@ module BST
     end
 
     private
-
-    attr_accessor :root
 
     def find_parent(value: nil)
       return nil if empty?
